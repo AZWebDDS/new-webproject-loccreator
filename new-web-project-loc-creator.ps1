@@ -1,58 +1,7 @@
-﻿cls
-
-## # Переменные сеанса:
-
-# Код, который записывается в index.html файл:
-
-$index_html_code = 
-'<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <title>PROJECT_NAME</title>
-</head>
-
-<body>
-
-    <div class="">Hello World!</div>
-    <div class="">Далее какой-то текст...</div>
-
-</body>
-
-</html>'
-
-$index_php_code = 
-"
-<?php
-/**
- * PHP Version 7
- * Начальный index-файл (заглушка)
- * @author   AZWebDDS <AZWebDDS@gmail.com>
- * @link     http://....
- */
- 
-echo '<h1>Hello World!</h1>';
-echo '<div style=`"color: green`">Ваш новый локальный хост (сайт) готов!</div>';
-echo '<div><a href=`"http://$project_name`">http://$project_name</a></div>';
-
-phpijnbfo();
-"
-
-$end_to_vhosts_file = 
-"
-    # Вирт. хост http://$project_name
-    <VirtualHost *:80>
-        ServerAdmin webmaster@$project_name
-        DocumentRoot `"e:/www/2018/SANDBOX/PHP/$project_name/www`"
-        ServerName $project_name
-        ErrorLog `"e:/www/2018/SANDBOX/PHP/$project_name/logs/error.log`"
-        CustomLog `"e:/www/2018/SANDBOX/PHP/$project_name/logs/access.log`" common
-    </VirtualHost>
-    <Directory `"e:/www/2018/SANDBOX/PHP/$project_name/www`">
-        AllowOverride All
-        Require all granted
-    </Directory>"
+﻿# Очистка экрана
+# Удаление переменных
+cls
+Remove-Variable -Name * -Force -ErrorAction SilentlyContinue
 
 
 
@@ -105,7 +54,7 @@ Clear-Host
 ' ______________________'
 ''
 ' На этом этапе ваш ПРОЕКТ (сайт) будет установлен в выбранный вами КАТАЛОГ.'
-' Для этого ведите правильный путь от корня диска до КАТАЛОГА вашего ПРОЕКТА (закрывающий слеш обязателен)' 
+' Для этого ведите правильный путь от корня диска до КАТАЛОГА вашего ПРОЕКТА (без закрывающего слеша)' 
 ' и нажмите Enter'
 ''
 ' Например:'
@@ -160,24 +109,96 @@ if ($yes_not -Match "y|Y|д|Д")
     cd ./www
     New-Item . -Name .gitignore -ItemType File
     New-Item . -Name .htaccess -ItemType File
-    New-Item . -Name index.html -ItemType File -Value $index_html_code
-    New-Item . -Name index.php -ItemType File -Value $index_php_code
     New-Item . -Name README.md -ItemType File
+
+    # Создание файла index.html
+    # Код, который записывается в index.html файл:
+    $index_html_code = 
+"<!DOCTYPE html>
+<html lang=`"en`">
+
+<head>
+    <meta charset=`"UTF-8`">
+    <title>Проект $project_name</title>
+</head>
+
+<body>
+
+    <h1>Hello World!</h1>
+    <div style=`"color: green`">Ваш новый локальный хост (сайт) готов!</div>
+    <div><a href=`"http://$project_name`">http://$project_name</a></div>
+
+</body>
+</html>"
+    New-Item . -Name index.html -ItemType File -Value $index_html_code
     
+    # Создание файла index.php
+    # Код, который записывается в index.php файл:
+    $index_php_code = 
+"
+<?php
+/**
+ * PHP Version 7
+ * Начальный index-файл (заглушка)
+ * @author   AZWebDDS <AZWebDDS@gmail.com>
+ * @link     http://$project_name
+ */
+ 
+echo '<h1>Hello World!</h1>';
+echo '<div style=`"color: green`">Ваш новый локальный хост (сайт) готов!</div>';
+echo '<div><a href=`"http://$project_name`">http://$project_name</a></div>';
+
+phpinfo();
+"
+    New-Item . -Name index.php -ItemType File -Value $index_php_code
+
+    
+    # Проверка директории сайта
     dir
 
-    ## Создание самого хоста на сервере
-    $end_to_vhosts_file | Out-File -FilePath f:\2018\DevProg\WebDev\XAMPP-722-0-VC15\apache\conf\extra\httpd-vhosts.conf -Append -Encoding utf8
+    ## Создание записи в vhost файле XAMPPa
+    $record_to_vhosts_file = 
+    "
+    # Вирт. хост http://$project_name
+    <VirtualHost *:80>
+        ServerAdmin webmaster@$project_name
+        DocumentRoot `"$path_to_project\$project_name\www`"
+        ServerName $project_name
+        ErrorLog `"$path_to_project\$project_name\logs\error.log`"
+        CustomLog `"$path_to_project\$project_name\logs\access.log`" common
+    </VirtualHost>
+    <Directory `"$path_to_project\$project_name\www`">
+        AllowOverride All
+        Require all granted
+    </Directory>"
+    $record_to_vhosts_file | Out-File -FilePath f:\2018\DevProg\WebDev\XAMPP-722-0-VC15\apache\conf\extra\httpd-vhosts.conf -Append -Encoding utf8
     
+
+    ## Создание записи в файле hosts
+
+    ## Автоматическое создание записи в файле hosts временно отключено 
+    ## и осуществялется вручную после установки проекта.
+
+    <#
     $end_to_hosts_file = Write-Host '127.0.0.1' $($project_name)
     Start-Process powershell "-NoExit -Command `"Add-Content -Path 'c:\Windows\System32\drivers\etc\hosts' -Value `"$end_to_hosts_file`"`"" -Verb RunAs
+    #>
 
+
+
+    ## Окончание работы скрипта
+
+    ''
+    Write-Host 'Ожидайте окончания работы скрипта (ок. 5 сек.)' -ForegroundColor Cyan
     Start-Sleep -Seconds 5
 
+    ''
+    'Все хорошо. Скрипт закончил работу.'
+    ''
+    'До свидания.'
+    Start-Sleep -Seconds 3
 
-
-
-    Pause
+    # Pause
 
 }
 else
@@ -186,4 +207,4 @@ else
 }
 
 ''
-Pause
+# Pause
