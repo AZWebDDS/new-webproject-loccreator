@@ -27,16 +27,46 @@ cd $path_to_project
 ' Это скрипт для создания нового Web ПРОЕКТА (локального сайта, хоста) на локальном сервере XAMPP.'
 ' В скрипте используется новый шаблон структуры проекта (сайта, 2018):'
 ''
+''
 '    Ваш-Проект-v2018.loc'
-'        ../_PROJECT_'             
-'          /logs'
-'          /www'
-'              /.gitignore'
-'              /.htaccess'
-'              /index.html'
-'              /index.php'
-'              /README.md'
-'          /ThisProject.todo'
+'        ..'
+'            _PROJECT_  (для метафайлов IDE, редакторов т.п.)'
+'            logs (для логов Apache и т.п.)'
+'            htdocs (каталог для размещения самого проекта)'
+'                ./app (код ядра вашего приложения, классы)'
+'                ./bootstrap (css-фреймворк или автозагрузчик, cashe)'
+'                ./config (все конфигурационные файлы)'
+'                ./database (миграции и классы для начальных данных или файл SQLite)'
+'                ./public (входная точка, содержит index.php и др. ресурсы - img, css, js)'
+'                    ././css'
+'                        ./././typography.html (файл визуализации шаблонов верстки и типографики)'
+'                        ./././header.min.css (минимизированный файл заголовка в css)'
+'                        ./././main.min.css (минимизированный файл основной части в css)'
+'                        и т.д.'
+'                    ././fonts (шрифты)'
+'                    ././img (изображения для шаблона)'
+'                    ././js'
+'                    ././libs (подключаемые библиотеки)'
+'                    ././.htaccess'
+'                    ././index.html (файл-заглушка)'
+'                    ././index.php (файл-заглушка)'
+'                    ././README.md (публичное, размещаемое описание проекта)'
+'                ./resources (представления, языковые файлы и некомпилированные ресурсы - LESS, SASS, JavaScript)'
+'                    ././sass'
+'                        ./././vars.sass (файл переменных для SASS)'
+'                        ./././header.sass (файл заголовкадля SASS)'
+'                        и т.д.'
+'                ./routes (маршруты web.php, api.php и console.php)'
+'                ./storage (Blade и др. шаблоны разметки, создаваемые сессии, кэши, логи и др., загруженные jpeg, pdf и др.)'
+'                ./tests (юнит-тесты)'
+'                ./vendor (Composer-зависимости)'
+'                ./.gitattributes (файл атрибутов для Git)'
+'                ./.gitignore'
+'                ./.env (для работы с переменными среды $_ENV)'
+'                ./composer.json'
+'                ./phpunit.xml (для PHPUnit тестов)'
+'            ThisProject.todo (служебное, не размещаемое общее описание проекта и ToDo)'
+''
 ''
 ' Последовательно выполняя указанные инструкции, вы установите и правильно настроите свой проект (локальной сайт).'
 ''
@@ -93,8 +123,8 @@ $yes_not = Read-Host
 if ($yes_not -Match "y|Y|д|Д")
 {
     cd_catalog($path_to_project)
-    # Создать каталог и перейти в него
-    # Создать файл в этом новом каталоге
+    # Создать каталог приложения и перейти в него
+    # Создать каталоги и файлы по шаблону
 
     $project_name = Read-Host ' Введите имя директории  проекта (название проекта)'
     New-Item . -Name $project_name -ItemType Directory
@@ -102,15 +132,26 @@ if ($yes_not -Match "y|Y|д|Д")
 
     New-Item . -Name _PROJECT_ -ItemType Directory
     New-Item . -Name logs -ItemType Directory
-    New-Item . -Name ThisProject.todo -ItemType File
+    New-Item . -Name htdocs -ItemType Directory
+    cd ./htdocs
+    New-Item . -Name app -ItemType Directory
+    New-Item . -Name bootstrap -ItemType Directory
+    New-Item . -Name config -ItemType Directory
+    New-Item . -Name database -ItemType Directory
+    New-Item . -Name public -ItemType Directory
+    cd ././public
+    New-Item . -Name css -ItemType Directory
+    cd ./././css
+    New-Item . -Name typography.html -ItemType File -Value 'Файл визуализации шаблонов верстки и типографики'
+    New-Item . -Name header.min.css -ItemType File
+    New-Item . -Name main.min.css -ItemType File
 
-
-    New-Item . -Name www -ItemType Directory
-    cd ./www
-    New-Item . -Name .gitignore -ItemType File
-    New-Item . -Name .htaccess -ItemType File
-    New-Item . -Name README.md -ItemType File
-
+    cd $path_to_project/$project_name/htdocs/public
+    New-Item . -Name fonts -ItemType Directory
+    New-Item . -Name img -ItemType Directory
+    New-Item . -Name js -ItemType Directory
+    New-Item . -Name libs -ItemType Directory
+    New-Item . -Name .htaccess -ItemType File -Value 'AddDefaultCharset UTF-8'
     # Создание файла index.html
     # Код, который записывается в index.html файл:
     $index_html_code = 
@@ -131,7 +172,6 @@ if ($yes_not -Match "y|Y|д|Д")
 </body>
 </html>"
     New-Item . -Name index.html -ItemType File -Value $index_html_code
-    
     # Создание файла index.php
     # Код, который записывается в index.php файл:
     $index_php_code = 
@@ -151,10 +191,33 @@ echo '<div><a href=`"http://$project_name`">http://$project_name</a></div>';
 phpinfo();
 "
     New-Item . -Name index.php -ItemType File -Value $index_php_code
+    New-Item . -Name README.md -ItemType File -Value 'Публичное, размещаемое описание проекта'
 
+    cd $path_to_project/$project_name/htdocs
+    New-Item . -Name resources -ItemType Directory
+    cd ././resources
+    New-Item . -Name sass -ItemType Directory
+    cd ./././sass
+    New-Item . -Name vars.sass -ItemType File -Value 'Файл переменных для SASS'
+    New-Item . -Name header.sass -ItemType File -Value 'Файл заголовка для SASS' 
+    
+    cd $path_to_project/$project_name/htdocs                                     
+    New-Item . -Name routes -ItemType Directory
+    New-Item . -Name storage -ItemType Directory              
+    New-Item . -Name tests -ItemType Directory
+    New-Item . -Name vendor -ItemType Directory                
+    New-Item . -Name .gitattributes -ItemType File 
+    New-Item . -Name .gitignore -ItemType File 
+    New-Item . -Name .env -ItemType File 
+    New-Item . -Name composer.json -ItemType File 
+    New-Item . -Name phpunit.xml -ItemType File
+
+    cd $path_to_project/$project_name
+    New-Item . -Name ThisProject.todo -ItemType File
     
     # Проверка директории сайта
     dir
+    Pause
 
     ## Создание записи в vhost файле XAMPPa
     $record_to_vhosts_file = 
@@ -171,7 +234,7 @@ phpinfo();
         AllowOverride All
         Require all granted
     </Directory>"
-    $record_to_vhosts_file | Out-File -FilePath f:\2018\DevProg\WebDev\XAMPP-722-0-VC15\apache\conf\extra\httpd-vhosts.conf -Append -Encoding utf8
+    $record_to_vhosts_file | Out-File -FilePath F:\2018\DevProg\xampp-7240vc15\apache\conf\extra\httpd-vhosts.conf -Append -Encoding utf8
     
 
     ## Создание записи в файле hosts
